@@ -1,5 +1,8 @@
+<%@page import="java.util.Date"%>
+<%@page import="Modelos.LibroConElementoDTO"%>
+<%@page import="Modelos.Elemento"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, Modelos.Libro" %>
+<%@ page import="java.util.List, Modelos.Libro, java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -174,10 +177,13 @@
             <a class="nav-link">Libros</a>
             <a class="nav-link" href="../revistas/">Revistas</a>
             <a class="nav-link" href="../audiovisuales/">Elementos Audiovisuales</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../../admin/usuarios/lista">Lista de usuarios</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../../admin/usuarios/nuevo">Crear usuario</a>
+            <a class="nav-link" style="background-color: #ff9ea2;" href="../../login">Cerrar sesión</a>
         </div>
 
         <div class="container">
-            <!-- Mensajes de éxito/error -->
+            <h1>Libros</h1>
             <% String success = (String) request.getAttribute("success"); %>
             <% if (success != null && !success.isEmpty()) {%>
             <div class="alert alert-success"><%= success%></div>
@@ -188,35 +194,59 @@
                 <% Libro libroForm = (Libro) request.getAttribute("libroForm");%>
                 <%= (libroForm != null && libroForm.getLibroId() != null) ? "Editar Libro" : "Nuevo Libro"%>
             </button>
+            <br><br>
 
             <!-- Formulario de creación/edición -->
             <div id="formularioLibro" class="form-container <%= (libroForm != null && libroForm.getLibroId() != null) ? "" : "hidden"%>">
                 <h2><%= (libroForm != null && libroForm.getLibroId() != null) ? "Editar Libro" : "Nuevo Libro"%></h2>
-                <form action="${pageContext.request.contextPath}/libros/guardar" method="post">
-                    <input type="hidden" name="libroId" value="<%= (libroForm != null) ? libroForm.getLibroId() : ""%>">
+                <form action="${pageContext.request.contextPath}/empleado/libros/guardar" method="post">
+                    <input type="hidden" name="libroId" value="<%= (libroForm != null && libroForm.getLibroId() != null) ? libroForm.getLibroId() : ""%>">
 
+                    <!-- Campos del elemento (solo para creación) -->
+                    <% if (libroForm == null || libroForm.getLibroId() == null) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    %>
                     <div class="form-group">
-                        <label for="elementoId">ID de Elemento</label>
-                        <input id="elementoId" name="elementoId" class="form-control" 
-                               type="number" required value="<%= (libroForm != null) ? libroForm.getElementoId() : ""%>">
+                        <label>Título del Elemento</label>
+                        <input type="text" name="titulo" class="form-control" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="genero">Género</label>
-                        <input id="genero" name="genero" class="form-control" 
-                               type="text" required value="<%= (libroForm != null) ? libroForm.getGenero() : ""%>">
+                        <label>Autor del Elemento</label>
+                        <input type="text" name="autor" class="form-control" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="numPaginas">Número de páginas</label>
-                        <input id="numPaginas" name="numPaginas" class="form-control" 
-                               type="number" required value="<%= (libroForm != null) ? libroForm.getNumPaginas() : ""%>">
+                        <label>Fecha de Publicación</label>
+                        <input type="date" name="fechaPublicacion" class="form-control" required
+                               value="<%= sdf.format(new Date())%>">
                     </div>
 
                     <div class="form-group">
-                        <label for="editorial">Editorial</label>
-                        <input id="editorial" name="editorial" class="form-control" 
-                               type="text" required value="<%= (libroForm != null) ? libroForm.getEditorial() : ""%>">
+                        <label>Ejemplares Disponibles</label>
+                        <input type="number" name="numEjemDispo" class="form-control" min="1" value="1" required>
+                    </div>
+                    <% } else {%>
+                    <input type="hidden" name="elementoId" value="<%= libroForm.getElementoId()%>">
+                    <% }%>
+
+                    <!-- Campos del libro -->
+                    <div class="form-group">
+                        <label>Género</label>
+                        <input type="text" name="genero" class="form-control" 
+                               value="<%= (libroForm != null) ? libroForm.getGenero() : ""%>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número de Páginas</label>
+                        <input type="number" name="numPaginas" class="form-control" min="1"
+                               value="<%= (libroForm != null) ? libroForm.getNumPaginas() : ""%>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Editorial</label>
+                        <input type="text" name="editorial" class="form-control"
+                               value="<%= (libroForm != null) ? libroForm.getEditorial() : ""%>" required>
                     </div>
 
                     <button type="submit" class="btn btn-success">Guardar</button>
@@ -228,29 +258,38 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Elemento ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Fecha Publicación</th>
+                        <th>Ejemplares</th>
                         <th>Género</th>
-                        <th onclick="sortTable()" style="cursor: pointer;">Páginas ⬍</th>
+                        <th>Páginas</th>
                         <th>Editorial</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <%
-                        List<Libro> libros = (List<Libro>) request.getAttribute("libros");
-                        if (libros != null) {
-                            for (Libro libro : libros) {
+                        List<LibroConElementoDTO> librosConElementos = (List<LibroConElementoDTO>) request.getAttribute("librosConElementos");
+                        if (librosConElementos != null) {
+                            for (LibroConElementoDTO dto : librosConElementos) {
+                                Libro libro = dto.getLibro();
+                                Elemento elemento = dto.getElemento();
                     %>
                     <tr>
-                        <td><%= libro.getLibroId()%></td>
-                        <td><%= libro.getElementoId()%></td>
-                        <td><%= libro.getGenero()%></td>
-                        <td><%= libro.getNumPaginas()%></td>
-                        <td><%= libro.getEditorial()%></td>
+                        <td><%= elemento != null ? elemento.getTitulo() : "N/A"%></td>
+                        <td><%= elemento != null ? elemento.getAutor() : "N/A"%></td>
+                        <td><%= elemento != null ? elemento.getFechaPublicacion() : "N/A"%></td>
+                        <td><%= elemento != null ? elemento.getNumEjemDispo() : "N/A"%></td>
+                        <td><%= libro != null ? libro.getGenero() : "N/A"%></td>
+                        <td><%= libro != null ? libro.getNumPaginas() : "N/A"%></td>
+                        <td><%= libro != null ? libro.getEditorial() : "N/A"%></td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/libros/editar/<%= libro.getLibroId()%>" class="btn btn-primary">Editar</a>
-                            <a href="${pageContext.request.contextPath}/libros/eliminar/<%= libro.getLibroId()%>" class="btn btn-danger" 
+                            <a href="${pageContext.request.contextPath}/empleado/libros/editar/<%= libro.getLibroId()%>" 
+                               class="btn btn-primary">Editar</a>
+                               <br><br>
+                            <a href="${pageContext.request.contextPath}/empleado/libros/eliminar/<%= libro.getLibroId()%>" 
+                               class="btn btn-danger"
                                onclick="return confirm('¿Estás seguro de eliminar este libro?')">Eliminar</a>
                         </td>
                     </tr>
@@ -270,7 +309,6 @@
             <% }%>
             };
 
-            // Resto del código JavaScript permanece igual
             function mostrarFormulario() {
                 document.getElementById('formularioLibro').classList.remove('hidden');
                 document.getElementById('btnNuevoLibro').classList.add('hidden');
@@ -280,11 +318,10 @@
             function ocultarFormulario() {
                 document.getElementById('formularioLibro').classList.add('hidden');
                 document.getElementById('btnNuevoLibro').classList.remove('hidden');
+                document.querySelector('form').reset();
             }
 
-            let ascending = true;
-
-            function sortTable() {
+             function sortTable() {
                 const table = document.querySelector("table");
                 const tbody = table.querySelector("tbody") || table;
                 const rows = Array.from(tbody.rows);

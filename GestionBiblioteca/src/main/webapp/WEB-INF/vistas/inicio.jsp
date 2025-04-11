@@ -13,6 +13,8 @@
                 font-family: 'Poppins', sans-serif;
                 margin: 0;
                 padding: 0;
+                text-align: center;
+                align-content: center;
             }
 
             .navbar {
@@ -47,6 +49,21 @@
             .nav-link:hover {
                 background-color: rgba(255, 255, 255, 0.2);
             }
+
+            /* Estilo para el mensaje de bienvenida */
+            .welcome-message {
+                font-size: 3rem;
+                font-weight: 700;
+                background: linear-gradient(45deg, #000, #434343, #222);
+                -webkit-background-clip: text;
+                color: transparent;
+                text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.7);
+                margin-top: 250px;  /* Espacio desde la parte superior */
+                padding: 10px;
+                max-width: 80%;
+                line-height: 1.4;
+                margin-left: 150px;
+            }
         </style>
     </head>
     <body>
@@ -55,6 +72,13 @@
             <a class="nav-link" href="./libros/">Libros</a>
             <a class="nav-link" href="./revistas/">Revistas</a>
             <a class="nav-link" href="./audiovisuales/">Elementos Audiovisuales</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../admin/usuarios/lista">Lista de usuarios</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../admin/usuarios/nuevo">Crear usuario</a>
+            <a class="nav-link" style="background-color: #ff9ea2;" href="../login">Cerrar sesión</a>
         </div>
+        <div class="welcome-message">
+            Bienvenido a la biblioteca T-Rexoteca
+        </div>
+
     </body>
 </html>

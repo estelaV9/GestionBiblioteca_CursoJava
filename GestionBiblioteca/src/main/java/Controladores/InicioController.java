@@ -15,7 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class InicioController {
 
-    @GetMapping("/")
+    @GetMapping("/empleado/")
     public ModelAndView inicio() {
         ModelAndView mav = new ModelAndView("inicio");
 

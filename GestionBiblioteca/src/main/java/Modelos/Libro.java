@@ -21,7 +21,7 @@ public class Libro {
     @Size(min = 2, max = 100, message = "El género debe tener entre 2 y 100 caracteres")
     @Column(name = "genero", nullable = false, length = 100)
     private String genero;
-    
+
     @NotNull(message = "El número de páginas es obligatorio")
     @Min(value = 1, message = "Debe tener al menos 1 página")
     @Column(name = "num_page", nullable = false)
@@ -29,7 +29,7 @@ public class Libro {
 
     @Column(name = "editorial", nullable = false, length = 100)
     private String editorial;
-
+ 
     // Constructores
     public Libro() {
     }
@@ -81,4 +81,5 @@ public class Libro {
     public void setEditorial(String editorial) {
         this.editorial = editorial;
     }
+
 }

@@ -117,6 +117,55 @@
                 text-align: center;
                 color: #3affef;
             }
+            .form-container {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 20px;
+                margin-bottom: 30px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #3affef;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+                border: none;
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+
+            .btn-danger {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+            }
+
+            .btn-danger:hover {
+                background-color: #bb2d3b;
+            }
+
+            .btn-success {
+                background-color: #28a745;
+                color: white;
+                border: none;
+            }
+
+            .btn-success:hover {
+                background-color: #218838;
+            }
+
+            .hidden {
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -125,15 +174,63 @@
             <a class="nav-link" href="../libros/">Libros</a>
             <a class="nav-link" href="../revistas/">Revistas</a>
             <a class="nav-link">Elementos Audiovisuales</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../../admin/usuarios/lista">Lista de usuarios</a>
+            <a class="nav-link" style="background-color: lightblue; color: black;" href="../../admin/usuarios/nuevo">Crear usuario</a>
+            <a class="nav-link" style="background-color: #ff9ea2;" href="../../login">Cerrar sesión</a>
         </div>
 
         <div class="container">
             <h1>Elementos Audiovisuales</h1>
+
+            <!-- Botón para mostrar el formulario -->
+            <button id="btnNuevoAudiovisual" class="btn btn-primary" onclick="mostrarFormulario()">Añadir Nuevo Elemento Audiovisual</button>
+            <br>
+            <br>
+            <!-- Formulario de creación (oculto al inicio) -->
+            <div id="formularioAudiovisual" class="form-container hidden">
+                <h2>Nuevo Elemento Audiovisual</h2>
+                <form action="${pageContext.request.contextPath}/empleado/audiovisuales/guardar" method="post">
+                    Elemento ID: <input type="number" name="elementoId" placeholder="Elemento ID" required>
+                    Formato: <select name="formato" required>
+                        <option value="CD">CD</option>
+                        <option value="DVD">DVD</option>
+                        <option value="BLURAY">BLURAY</option>
+                    </select>
+                    <br><br>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" onclick="cerrarFormulario()" class="btn btn-secondary">Cancelar</button>
+                </form>
+            </div>
+
+            <!-- Formulario de edición (escondido por defecto) -->
+            <div id="editarForm" style="display:none;">
+                <h2>Editar Elemento Audiovisual</h2>
+                <form action="${pageContext.request.contextPath}/empleado/audiovisuales/editar" method="post">
+                    <input type="hidden" id="audiovisualId" name="audiovisualId" />
+                    <div>
+                        <label for="elementoId">Elemento ID:</label>
+                        <input type="number" id="elementoId" name="elementoId" required />
+                    </div>
+                    <div>
+                        <label for="formato">Formato:</label>
+                        <select id="formato" name="formato" required>
+                            <option value="CD">CD</option>
+                            <option value="DVD">DVD</option>
+                            <option value="BLURAY">BLURAY</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    <button type="button" onclick="cerrarEditarForm()" class="btn btn-primary">Cancelar</button>
+                </form>
+            </div>
+
+            <!-- Mostrar los elementos existentes -->
             <table>
                 <thead>
                     <tr>
                         <th>Elemento ID</th>
                         <th>Formato</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -145,6 +242,14 @@
                     <tr>
                         <td><%= av.getElementoId()%></td>
                         <td><%= av.getFormato()%></td>
+                        <td>
+                            <!-- Botón para editar -->
+                            <a href="#" onclick="editar(<%= av.getAudiovisualId()%>, <%= av.getElementoId()%>, '<%= av.getFormato()%>')" class="btn btn-primary">Editar</a>
+                            <!-- Botón para eliminar -->
+                            <a href="${pageContext.request.contextPath}/empleado/audiovisuales/eliminar/<%= av.getAudiovisualId()%>" class="btn btn-danger">Eliminar</a>
+
+
+                        </td>
                     </tr>
                     <%
                             }
@@ -152,6 +257,34 @@
                     %>
                 </tbody>
             </table>
+
         </div>
+
+        <script>
+            function mostrarFormulario() {
+                // Mostrar el formulario de creación
+                document.getElementById('formularioAudiovisual').classList.remove('hidden');
+                document.getElementById('btnNuevoAudiovisual').classList.add('hidden');
+            }
+
+            function cerrarFormulario() {
+                // Ocultar el formulario de creación
+                document.getElementById('formularioAudiovisual').classList.add('hidden');
+                document.getElementById('btnNuevoAudiovisual').classList.remove('hidden');
+            }
+
+            function editar(audiovisualId, elementoId, formato) {
+                // Mostrar el formulario de edición y llenar los campos
+                document.getElementById('editarForm').style.display = 'block';
+                document.getElementById('audiovisualId').value = audiovisualId;
+                document.getElementById('elementoId').value = elementoId;
+                document.getElementById('formato').value = formato;
+            }
+
+            function cerrarEditarForm() {
+                // Ocultar el formulario de edición
+                document.getElementById('editarForm').style.display = 'none';
+            }
+        </script>
     </body>
 </html>
